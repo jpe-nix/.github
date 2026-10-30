@@ -1,0 +1,36 @@
+name: Nix validation
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner_label: macos-15
+          - runner_label: ubuntu-24.04-arm
+          - runner_label: ubuntu-24.04
+    uses: JacobPEvans/.github/.github/workflows/_nix-validate.yml@ffe26a1b65a00afec6a06d8001ef07896306478e # v1.40.2
+    with:
+      runner_label: ${{ matrix.runner_label }}
+      all_systems: false
+
+  gate:
+    if: github.event_name == 'pull_request'
+    needs: validate
+    permissions:
+      contents: read
+      pull-requests: read
+      actions: write
+    uses: JacobPEvans/.github/.github/workflows/_ci-gate.yml@ffe26a1b65a00afec6a06d8001ef07896306478e # v1.40.2
+    with:
+      profile: nix
+      all_systems: false
