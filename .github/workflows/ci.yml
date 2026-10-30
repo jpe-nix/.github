@@ -1,0 +1,23 @@
+name: Nix validation
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner_label: macos-15
+          - runner_label: ubuntu-24.04-arm
+          - runner_label: ubuntu-24.04
+    uses: JacobPEvans/.github/.github/workflows/_nix-validate.yml@ffe26a1b65a00afec6a06d8001ef07896306478e # v1.40.2
+    with:
+      runner_label: ${{ matrix.runner_label }}
+      all_systems: false
